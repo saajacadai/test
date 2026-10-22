@@ -340,6 +340,31 @@ tr.row.saving{opacity:.5}
 @media (max-width:640px){.sync{max-width:100%}.pill{white-space:normal;max-width:100%}}
 :root{--ok:#2e9e5b;--risk-soft:#f6c1c1;--risk-line:#e08c8c}
 .g-late{background:repeating-linear-gradient(45deg,#f6c1c1 0 4px,transparent 4px 8px)!important}
+/* details: estimated monthly percentage, total and section rows */
+.dm-band{border:1px solid var(--b100);border-radius:12px;padding:12px 14px 14px;margin:2px 0 14px;background:linear-gradient(160deg,var(--b50),var(--surface) 55%)}
+.dm-top{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;margin-bottom:10px}
+.dm-top b{font-size:14px;color:var(--b900)}
+.dm-top .sub{flex:1 1 260px;font-size:11.5px;color:var(--muted)}
+.dm-grid{display:grid;grid-template-columns:250px minmax(0,1fr);gap:14px;align-items:stretch}
+.dm-grid .hero{background:var(--surface)}
+.hero .up{color:#1f7a45;font-weight:600}
+.hero .down{color:var(--p700);font-weight:600}
+.dm-secs{display:flex;flex-direction:column;gap:8px}
+.dm-sec{flex:1;display:flex;flex-direction:column;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.dm-sec .meter{margin-top:6px}
+.dm-sec .pt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px}
+.dm-sec .pt span{font-weight:700;color:var(--b900);font-size:15px}
+.dm-sec .pt small{flex:1;font-size:11px;color:var(--muted)}
+tr.agg td{background:var(--surface-2)}
+tr.agg.grp td{border-top:2px solid var(--b100)}
+tr.agg.tot td{background:var(--b50)}
+tr.agg .task{color:var(--b900);font-weight:700}
+tr.agg td.num{font-weight:700;color:var(--b900)}
+.mc .hc.msel{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--b400)}
+.mc.mh span{width:34px;flex:none;text-align:center}
+.mc.mh span.msel{color:var(--b900);font-weight:700}
+.mc.mh span[data-act]{cursor:pointer}
+@media (max-width:760px){.dm-grid{grid-template-columns:minmax(0,1fr)}}
 /* external page: account chip, sign-in, details gate */
 .acct{display:flex;align-items:center;gap:8px;min-height:32px}
 .acct .who{display:inline-flex;align-items:center;gap:8px;max-width:230px;padding:3px 4px 3px 12px;border:1px solid var(--b100);border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:500;color:var(--ink-2)}
@@ -1117,34 +1142,83 @@ function editState(id) {
 }
 function formState(form) { var o = {}; Array.prototype.forEach.call(form.elements, function (el) { if (el.name) o[el.name] = el.value; }); return o; }
 
+/* the month the summary looks at: the chosen one if it has scores, else the latest month with scores */
+function dMonthIdx(A) {
+  var P = S.P, i = S.dMonth != null ? P.months.indexOf(S.dMonth) : -1;
+  if (i >= 0 && A.overallM[i] != null) return i;
+  for (i = A.overallM.length - 1; i >= 0; i--) if (A.overallM[i] != null) return i;
+  return Math.max(0, P.lastIdx);
+}
+/* estimated achievement for one month, as on the central page: the plan's figure, then each section's */
+function detailsBand(all, A, mi) {
+  var P = S.P, m = P.months[mi], v = A.overallM[mi], pv = mi > 0 ? A.overallM[mi - 1] : null, fl = anyFilter();
+  var measured = all.filter(function (r) { return r.m[mi] != null; }).length;
+  var sheetV = !fl && P.totals && P.totals.m ? P.totals.m[mi] : null, d = v != null && pv != null ? r1(v - pv) : null;
+  var h = '<div class="dm-band"><div class="dm-top"><b>النسبة التقديرية للشهر</b><span class="sub">' + (fl ? 'للمبادرات المعروضة حسب الفلاتر · ' : '') +
+    'متوسط درجات المبادرات في كل قسم، ثم متوسط الأقسام، بمعادلة صف «الإجمالي» في الورقة</span>' +
+    '<div class="seg-c" role="group" aria-label="الشهر">' + P.months.map(function (mm, i) {
+      var has = A.overallM[i] != null;
+      return '<button type="button" data-act="dm" data-m="' + mm + '" aria-pressed="' + (i === mi) + '"' + (has ? '' : ' disabled title="لم تُدخل درجات هذا الشهر بعد"') + '>' + mLabel(mm) + '</button>';
+    }).join('') + '</div></div><div class="dm-grid">';
+  h += '<div class="hero"><div style="font-size:12.5px;color:var(--ink-2)">شهر ' + m + ' · ' + MONTHS_AR[m - 1] + '</div><div class="big num">' + f1(v) + '<small>%</small></div>' +
+    '<div class="meter" style="height:10px"><span style="width:' + (v || 0) + '%;background:var(--b500)"></span></div><div class="ln" style="margin-top:10px">' +
+    (d != null ? '<span class="' + (d > 0 ? 'up' : d < 0 ? 'down' : '') + '">' + (d > 0 ? '▲ ' : d < 0 ? '▼ ' : '') + f1(Math.abs(d)) + ' نقطة</span> عن شهر ' + P.months[mi - 1] + '<br>' : '') +
+    'مبادرات مقيسة: <b class="num">' + measured + '</b> من ' + all.length +
+    (sheetV != null ? '<br>صف «الإجمالي» في الورقة: <b class="num">' + f1(sheetV) + '%</b>' : '') + '</div></div>';
+  h += '<div class="dm-secs">' + A.depts.map(function (dp, i) {
+    var x = A.dm[i][mi], rs = all.filter(function (r) { return r.dept === dp; }), k = rs.filter(function (r) { return r.m[mi] != null; }).length;
+    return '<div class="dm-sec"><div class="pt"><b>' + esc(dp) + '</b><small>' + k + ' من ' + rs.length + ' مبادرة مقيسة</small><span class="num">' + (x == null ? '—' : f1(x) + '%') + '</span></div>' +
+      '<div class="meter"><span style="width:' + (x || 0) + '%;background:' + (x != null && x < 80 ? 'var(--p400)' : 'var(--b600)') + '"></span></div></div>';
+  }).join('') + '</div></div></div>';
+  return h;
+}
+/* a summary row: the plan's or a section's percentage in each month column, and its final percentage */
+function aggRow(cls, title, sub, mv, fin, mi) {
+  var P = S.P;
+  return '<tr class="agg ' + cls + '"><td></td><td colspan="4"><div class="task">' + title + (sub ? '<small>' + sub + '</small>' : '') + '</div></td>' +
+    '<td><div class="mc">' + mv.map(function (v, i) { return hcell(v, i === mi ? 'msel' : '', 'شهر ' + P.months[i] + (v == null ? ': لم تُدخل درجات' : ': ' + f1(v) + '%')); }).join('') + '</div></td>' +
+    '<td class="c num">' + f1(fin) + '</td><td colspan="2"></td></tr>';
+}
+function detailRow(r, editable) {
+  var open = !!S.open[r.id], k = kindOf(r), why = k === 'risk' ? needWhy(r) : '';
+  var h = '<tr class="row' + (k ? ' k-' + k : '') + (open ? ' open' : '') + (S.saving[r.id] ? ' saving' : '') + '" data-act="row" data-id="' + r.id + '" tabindex="0" aria-expanded="' + open + '">' +
+    '<td class="num muted">' + (r.n != null ? r.n : '—') + '</td>' +
+    '<td style="max-width:360px"><div class="task">' + esc(r.task) + '<small>' + esc(r.prog) + '</small>' + (why ? '<small class="why">' + esc(why) + '</small>' : '') + '</div></td>' +
+    '<td style="font-size:12px;color:var(--ink-2);max-width:200px">' + esc(r.owner || '—') + '</td>' +
+    '<td class="num" style="white-space:nowrap">' + fmtD(r.start) + ' ← ' + fmtD(r.end) + '</td>' +
+    '<td>' + (editable ? statusSelect(r, r.cells.status, 'st-sel') : stTag(r.st, r.statusRaw)) + '</td>' +
+    '<td><div class="mc">' + r.m.map(function (v, i) { return mcell(r, i, editable); }).join('') + '</div></td>' +
+    '<td class="c num" style="font-weight:700">' + f1(r.fin) + '</td><td class="c">' +
+    (r.ev ? (r.ev.links.length ? '<a class="evi" href="' + esc(r.ev.links[0].url) + '" target="_blank" rel="noopener" data-tip="' + esc(r.ev.links.map(function (l) { return l.label; }).join('\n')) + '">↗' + (r.ev.links.length > 1 ? ' ' + r.ev.links.length : '') + '</a>' : '<span class="muted" data-tip="' + esc(r.ev.text) + '">نص</span>') : '<span class="muted">—</span>') +
+    '</td><td>' + rowFlags(r) + '</td></tr>';
+  if (open) h += editable ? editorRow(r) : readRow(r);
+  return h;
+}
+/* grouped by section like the sheet: a total row, then each section's row and its initiatives (sorting applies inside each section) */
 function viewDetails() {
   var P = S.P, all = filtered(), cnt = { ok: 0, risk: 0, rest: 0 };
   all.forEach(function (r) { cnt[kindOf(r) || 'rest']++; });
-  var rows = sortRows(all.filter(function (r) { return !S.dview || (kindOf(r) || 'rest') === S.dview; }));
-  var editable = canEditUI();
+  var vis = all.filter(function (r) { return !S.dview || (kindOf(r) || 'rest') === S.dview; });
+  var editable = canEditUI(), A = all.length ? deptMonthly(all, P) : null, mi = A ? dMonthIdx(A) : -1;
   function th(key, label, cls) { return '<th class="sort' + (cls ? ' ' + cls : '') + '" data-act="sort" data-k="' + key + '"' + (S.sort.k === key ? ' aria-sort="' + (S.sort.d > 0 ? 'ascending' : 'descending') + '"' : '') + '>' + label + '</th>'; }
   var views = [['', 'الكل', all.length], ['risk', 'تحتاج تدخل', cnt.risk], ['ok', 'مكتملة', cnt.ok], ['rest', 'قيد المتابعة', cnt.rest]];
   var h = '<div class="view"><div class="card"><div class="hd"><div><h2>المبادرات التفصيلية</h2><p class="sub">' +
     (editable ? 'التعديل يُكتب في الورقة مباشرة: تغيير الحالة من القائمة، والنقر على خانة الشهر لإسناد الدرجة، وفتح المبادرة لتعديل كل حقولها وإضافة الشواهد والملاحظات'
       : 'عرض فقط · التعديل متاح للحسابات التي تملك صلاحية تحرير الملف') + '</p></div>' +
-    '<div class="seg-c" role="group" aria-label="عرض">' + views.map(function (v) { return '<button type="button" data-act="dview" data-v="' + v[0] + '" aria-pressed="' + ((S.dview || '') === v[0]) + '">' + v[1] + '<span class="cnt num">' + v[2] + '</span></button>'; }).join('') + '</div></div>' +
-    '<div class="dv" style="margin-bottom:10px"><span class="key"><i class="ok"></i>مكتملة</span><span class="key"><i class="risk"></i>تحتاج تدخل: متأخرة، أو حلّ موعد بدئها ولم تبدأ، أو متوقفة، أو آخر درجة شهرية أقل من 80%</span></div>';
-  if (!rows.length) return h + '<div class="empty">لا توجد مبادرات تطابق الفلاتر الحالية.</div></div></div>';
+    '<div class="seg-c" role="group" aria-label="عرض">' + views.map(function (v) { return '<button type="button" data-act="dview" data-v="' + v[0] + '" aria-pressed="' + ((S.dview || '') === v[0]) + '">' + v[1] + '<span class="cnt num">' + v[2] + '</span></button>'; }).join('') + '</div></div>';
+  if (A) h += detailsBand(all, A, mi);
+  h += '<div class="dv" style="margin-bottom:10px"><span class="key"><i class="ok"></i>مكتملة</span><span class="key"><i class="risk"></i>تحتاج تدخل: متأخرة، أو حلّ موعد بدئها ولم تبدأ، أو متوقفة، أو آخر درجة شهرية أقل من 80%</span></div>';
+  if (!vis.length) return h + '<div class="empty">لا توجد مبادرات تطابق الفلاتر الحالية.</div></div></div>';
   h += '<div class="tbl"><table style="min-width:1080px"><thead><tr>' + th('n', '#') + th('task', 'المبادرة / الخطوة') + th('owner', 'المسؤول') + th('start', 'الفترة') + th('st', 'الحالة') +
-    '<th class="c">' + P.months.map(mLabel).join(' · ') + '</th>' + th('fin', 'النهائية', 'c') + '<th class="c">شواهد</th>' + th('flag', 'تنبيهات') + '</tr></thead><tbody>';
-  rows.forEach(function (r) {
-    var open = !!S.open[r.id], k = kindOf(r), why = k === 'risk' ? needWhy(r) : '';
-    h += '<tr class="row' + (k ? ' k-' + k : '') + (open ? ' open' : '') + (S.saving[r.id] ? ' saving' : '') + '" data-act="row" data-id="' + r.id + '" tabindex="0" aria-expanded="' + open + '">' +
-      '<td class="num muted">' + (r.n != null ? r.n : '—') + '</td>' +
-      '<td style="max-width:360px"><div class="task">' + esc(r.task) + '<small>' + esc(r.dept + ' · ' + r.prog) + '</small>' + (why ? '<small class="why">' + esc(why) + '</small>' : '') + '</div></td>' +
-      '<td style="font-size:12px;color:var(--ink-2);max-width:200px">' + esc(r.owner || '—') + '</td>' +
-      '<td class="num" style="white-space:nowrap">' + fmtD(r.start) + ' ← ' + fmtD(r.end) + '</td>' +
-      '<td>' + (editable ? statusSelect(r, r.cells.status, 'st-sel') : stTag(r.st, r.statusRaw)) + '</td>' +
-      '<td><div class="mc">' + r.m.map(function (v, i) { return mcell(r, i, editable); }).join('') + '</div></td>' +
-      '<td class="c num" style="font-weight:700">' + f1(r.fin) + '</td><td class="c">' +
-      (r.ev ? (r.ev.links.length ? '<a class="evi" href="' + esc(r.ev.links[0].url) + '" target="_blank" rel="noopener" data-tip="' + esc(r.ev.links.map(function (l) { return l.label; }).join('\n')) + '">↗' + (r.ev.links.length > 1 ? ' ' + r.ev.links.length : '') + '</a>' : '<span class="muted" data-tip="' + esc(r.ev.text) + '">نص</span>') : '<span class="muted">—</span>') +
-      '</td><td>' + rowFlags(r) + '</td></tr>';
-    if (open) h += editable ? editorRow(r) : readRow(r);
+    '<th class="c"><div class="mc mh">' + P.months.map(function (m, i) { return '<span' + (i === mi ? ' class="msel"' : '') + (A.overallM[i] != null ? ' data-act="dm" data-m="' + m + '"' : '') + '>' + mLabel(m) + '</span>'; }).join('') + '</div></th>' +
+    th('fin', 'النهائية', 'c') + '<th class="c">شواهد</th>' + th('flag', 'تنبيهات') + '</tr></thead><tbody>';
+  h += aggRow('tot', anyFilter() ? 'الإجمالي — المبادرات المعروضة حسب الفلاتر' : 'الإجمالي — كل الأقسام', 'متوسط الأقسام في كل شهر · النهائية: متوسط «النسبة النهائية» للأقسام', A.overallM, A.overallF, mi);
+  A.depts.forEach(function (dp, i) {
+    var rs = vis.filter(function (r) { return r.dept === dp; });
+    if (!rs.length) return;
+    var inDept = all.filter(function (r) { return r.dept === dp; }), risk = inDept.filter(function (r) { return kindOf(r) === 'risk'; }).length;
+    h += aggRow('grp', esc(dp), inDept.length + ' مبادرة' + (risk ? ' · ' + risk + ' تحتاج تدخل' : '') + (rs.length < inDept.length ? ' · المعروض منها ' + rs.length : ''), A.dm[i], A.df[i], mi);
+    sortRows(rs).forEach(function (r) { h += detailRow(r, editable); });
   });
   return h + '</tbody></table></div></div></div>';
 }
@@ -1679,6 +1753,7 @@ document.addEventListener('click', function (ev) {
   else if (act === 'cpm') { S.cpMonth = +el.getAttribute('data-m'); renderView(true); }
   else if (act === 'sort') { var sk = el.getAttribute('data-k'); S.sort = { k: sk, d: S.sort.k === sk ? -S.sort.d : (sk === 'fin' || sk === 'flag' ? -1 : 1) }; renderView(true); }
   else if (act === 'dview') { S.dview = el.getAttribute('data-v'); renderView(true); }
+  else if (act === 'dm') { S.dMonth = +el.getAttribute('data-m'); renderView(true); }
   else if (act === 'tl-range') { S.tl.range = el.getAttribute('data-v'); S.tl.zoom = S.tl.range === 'year' ? 0 : 1; S.tl.scrolled = false; save(); renderView(true); }
   else if (act === 'tl-zoom') { S.tl.zoom = Math.max(0, Math.min(TL_ZOOM.length - 1, S.tl.zoom + Number(el.getAttribute('data-v')))); S.tl.scrolled = false; save(); renderView(true); }
   else if (act === 'save') saveEditor(el.getAttribute('data-id'));
