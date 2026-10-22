@@ -391,6 +391,13 @@ tr.agg.tot .mc .hc.agc.msel{box-shadow:0 0 0 2px var(--b900),0 0 0 4px var(--b30
 .gate .lock{width:30px;height:30px;margin:0 auto;background:var(--b500)}
 .tab .lk{display:inline-block;width:11px;height:11px;flex:none;background:currentColor;opacity:.55}
 @media (max-width:640px){.acct .who{max-width:170px}.gate{margin:16px auto;padding:26px 16px 20px}}
+/* loading card: estimated progress while the sheets are read */
+.loadc{width:min(560px,100%);margin:32px auto;padding:22px 24px}
+.loadc .lt{display:flex;justify-content:space-between;align-items:baseline;gap:12px;color:var(--b900);font-size:14px}
+.loadc .lt .num{font-size:24px;font-weight:700}
+.loadc .meter{height:10px;margin-top:12px}
+.loadc .meter span{display:block;border-radius:5px;background:linear-gradient(90deg,var(--b600),var(--b400));transition:width .2s linear}
+.loadc .ls{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:12.5px;color:var(--muted)}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -1480,7 +1487,7 @@ function setSync() {
   else if (S.err) tx.textContent = 'تعذّر التحديث' + (S.fetchedAt ? ' · آخر بيانات ' + fmtTime(S.fetchedAt) : '');
   else if (S.preview) tx.textContent = 'معاينة تجريبية · التعديلات لا تصل إلى الملف · ' + fmtTime(S.fetchedAt);
   else tx.textContent = 'متزامن مع الورقة · آخر قراءة ' + fmtTime(S.fetchedAt);
-  el.title = S.user ? 'الحساب: ' + S.user : '';
+  el.title = [S.user ? 'الحساب: ' + S.user : '', loadInfo()].filter(Boolean).join('\n');
   var a = $('#sheetLink');
   if (S.sheetUrl) { a.href = S.sheetUrl; a.hidden = false; } else a.hidden = true;
 }
@@ -1560,15 +1567,63 @@ function ingest(d) {
 function fetchData() {
   if (S.busy) { S.again = true; return; }
   S.busy = true; setSync();
+  loadStart(authToken() ? 'full' : 'pub');
+  if (!S.P) $('#main').innerHTML = loadingCard();
   server('getData').then(function (d) {
-    S.busy = false;
+    S.busy = false; loadEnd(d);
     try { ingest(d); } catch (e) { S.err = e.message || String(e); if (!S.P) renderError(); setSync(); }
     if (S.again) { S.again = false; fetchData(); }
   }, function (e) {
-    S.busy = false; S.err = (e && e.message) || String(e); setSync();
+    S.busy = false; loadEnd(null); S.err = (e && e.message) || String(e); setSync();
     if (!S.P) renderError();
     if (S.again) { S.again = false; fetchData(); }
   });
+}
+
+/* ---------- loading: an estimated percentage while the sheets are read ---------- */
+/* One request has no real progress to report, so the bar follows how long the last loads took on this device
+   (team data and public data separately) and slows down near the end; the stage line says what is happening. */
+var LOAD = { t0: 0, kind: '', timer: null, last: null };
+var LOAD_KEY = 'ajyal-dash-lt';
+function loadHist() { try { return JSON.parse(localStorage.getItem(LOAD_KEY) || '{}') || {}; } catch (e) { return {}; } }
+function loadExpect(kind) {
+  var h = (loadHist()[kind] || []).slice().sort(function (a, b) { return a - b; });
+  return h.length ? Math.max(1500, h[Math.floor(h.length / 2)]) : (kind === 'full' ? 8000 : 5000);
+}
+function loadStart(kind) {
+  LOAD.t0 = Date.now(); LOAD.kind = kind;
+  clearInterval(LOAD.timer); LOAD.timer = setInterval(loadTick, 200);
+}
+function loadEnd(d) {
+  clearInterval(LOAD.timer);
+  if (!LOAD.t0) return;
+  var ms = Date.now() - LOAD.t0;
+  LOAD.t0 = 0;
+  if (!d) return;
+  LOAD.last = { ms: ms, srv: d.srv || null, read: d.ms || null, kind: LOAD.kind };
+  try { var h = loadHist(); h[LOAD.kind] = (h[LOAD.kind] || []).concat([ms]).slice(-5); localStorage.setItem(LOAD_KEY, JSON.stringify(h)); } catch (e) { /* storage blocked */ }
+  if (window.console && console.info) console.info('[لوحة المتابعة] تحميل ' + (ms / 1000).toFixed(1) + ' ث', LOAD.last);
+}
+function loadingCard() {
+  return '<div class="view"><div class="card loadc" id="loadc" role="status" aria-live="polite"><div class="lt"><b>جارٍ تحميل البيانات من الورقة</b><span class="num" id="loadPct">0%</span></div>' +
+    '<div class="meter"><span id="loadBar" style="width:0%"></span></div><div class="ls"><span id="loadStage">الاتصال بواجهة البيانات…</span><span class="num" id="loadSec"></span></div></div></div>';
+}
+function loadTick() {
+  if (!LOAD.t0 || !$('#loadc')) return;
+  var t = Date.now() - LOAD.t0, p = 95 * (1 - Math.exp(-2.3 * t / loadExpect(LOAD.kind)));
+  var stage = p < 12 ? 'الاتصال بواجهة البيانات…' : (LOAD.kind === 'full' && p < 30) ? 'التحقق من الحساب والصلاحية…' : p < 85 ? 'قراءة أوراق الخطة…' : 'تجهيز الصفحة…';
+  $('#loadPct').textContent = Math.floor(p) + '%';
+  $('#loadBar').style.width = p.toFixed(1) + '%';
+  $('#loadStage').textContent = stage;
+  $('#loadSec').textContent = Math.floor(t / 1000) + ' ث';
+}
+/* what the last load cost, for the sync pill's tooltip */
+function loadInfo() {
+  var L = LOAD.last;
+  if (!L) return '';
+  var srv = L.srv ? 'الخادم ' + (L.srv.ms / 1000).toFixed(1) + ' ث' + (L.srv.cached ? '، من الذاكرة المؤقتة' : '') : '';
+  var rd = L.srv && !L.srv.cached && L.read ? ' · قراءة الأوراق ' + (L.read.read / 1000).toFixed(1) + ' ث (الخطة ' + (L.read.plan / 1000).toFixed(1) + '، الشرائح ' + (L.read.chips / 1000).toFixed(1) + ')' : '';
+  return 'آخر تحميل: ' + (L.ms / 1000).toFixed(1) + ' ث' + (srv ? ' (' + srv + ')' : '') + rd;
 }
 /* every few seconds: ask only for the version number, and reload the data when it changed (team accounts more often than visitors) */
 function poll() {
@@ -1648,8 +1703,8 @@ function onCredential(resp) {
   if (!c || !c.exp) { toast('تعذّر تسجيل الدخول، ويمكن المحاولة مرة أخرى.', 'err'); return; }
   setToken(resp.credential, c, true);
   renderAcct();
-  if (S.tab === 'details' && !hasDetails()) renderView(true);
   fetchData();
+  if (S.tab === 'details' && !hasDetails()) renderView(true);
 }
 /* token expired or refused: back to the public view, remember who it was for the message, and offer a quick re-entry */
 function authLost() {
@@ -1721,7 +1776,8 @@ function viewDetailsGate() {
       '<p class="sub">لإتاحة هذه الصفحة لحساب: مشاركة ملف الخطة معه باسمه، عارضًا للاطلاع، أو محررًا للاطلاع والتعديل.</p>' +
       '<button class="btn ghost" type="button" data-act="signout">الدخول بحساب آخر</button>';
   } else if (u) {
-    h += '<p>جارٍ التحقق من صلاحية الحساب…</p>';
+    if (LOAD.t0) return loadingCard();
+    h += '<p>' + (S.err ? 'تعذّر تحميل التفاصيل: ' + esc(S.err) : 'جارٍ التحقق من صلاحية الحساب…') + '</p><button class="btn ghost" type="button" data-act="refresh">إعادة المحاولة</button>';
   } else {
     h += '<p>هذه الصفحة وتعديل البيانات لأعضاء الفريق، بعد تسجيل الدخول بحساب Google شُورك معه ملف الخطة.</p>' +
       (AUTH.lost ? '<p class="sub">انتهت جلسة الدخول السابقة (<span dir="ltr">' + esc(AUTH.lost) + '</span>).</p>' : '') +
