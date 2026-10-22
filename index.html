@@ -355,16 +355,23 @@ tr.row.saving{opacity:.5}
 .dm-sec .pt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px}
 .dm-sec .pt span{font-weight:700;color:var(--b900);font-size:15px}
 .dm-sec .pt small{flex:1;font-size:11px;color:var(--muted)}
-tr.agg td{background:var(--surface-2)}
-tr.agg.grp td{border-top:2px solid var(--b100)}
-tr.agg.tot td{background:var(--b50)}
-tr.agg .task{color:var(--b900);font-weight:700}
-tr.agg td.num{font-weight:700;color:var(--b900)}
 .mc .hc.msel{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--b400)}
 .mc.mh span{width:34px;flex:none;text-align:center}
 .mc.mh span.msel{color:var(--b900);font-weight:700}
 .mc.mh span[data-act]{cursor:pointer}
 @media (max-width:760px){.dm-grid{grid-template-columns:minmax(0,1fr)}}
+/* total and section rows: dark brand blue with white text; their month cells white so the numbers read clearly */
+tr.agg td{background:var(--b700);color:#fff;border-bottom-color:var(--b800)}
+tr.agg.tot td{background:var(--b900)}
+tr.agg.grp td{border-top:3px solid var(--surface)}
+tr.agg .task{color:#fff;font-weight:700}
+tr.agg .task small{color:rgba(255,255,255,.75)}
+tr.agg td.num{font-weight:700;color:#fff;font-size:14px}
+.mc .hc.agc{background:#fff;color:var(--b900);font-weight:700}
+.mc .hc.agc.low{background:var(--p100);color:var(--p700)}
+.mc .hc.agc.nd{background:rgba(255,255,255,.14);color:rgba(255,255,255,.6)}
+.mc .hc.agc.msel{box-shadow:0 0 0 2px var(--b700),0 0 0 4px var(--b300)}
+tr.agg.tot .mc .hc.agc.msel{box-shadow:0 0 0 2px var(--b900),0 0 0 4px var(--b300)}
 /* external page: account chip, sign-in, details gate */
 .acct{display:flex;align-items:center;gap:8px;min-height:32px}
 .acct .who{display:inline-flex;align-items:center;gap:8px;max-width:230px;padding:3px 4px 3px 12px;border:1px solid var(--b100);border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:500;color:var(--ink-2)}
@@ -1176,7 +1183,9 @@ function detailsBand(all, A, mi) {
 function aggRow(cls, title, sub, mv, fin, mi) {
   var P = S.P;
   return '<tr class="agg ' + cls + '"><td></td><td colspan="4"><div class="task">' + title + (sub ? '<small>' + sub + '</small>' : '') + '</div></td>' +
-    '<td><div class="mc">' + mv.map(function (v, i) { return hcell(v, i === mi ? 'msel' : '', 'شهر ' + P.months[i] + (v == null ? ': لم تُدخل درجات' : ': ' + f1(v) + '%')); }).join('') + '</div></td>' +
+    '<td><div class="mc">' + mv.map(function (v, i) {
+      return '<span class="hc agc' + (v == null ? ' nd' : v < 80 ? ' low' : '') + (i === mi ? ' msel' : '') + '" data-tip="' + esc('شهر ' + P.months[i] + (v == null ? ': لم تُدخل درجات' : ': ' + f1(v) + '%')) + '">' + (v == null ? '·' : valTxt(v)) + '</span>';
+    }).join('') + '</div></td>' +
     '<td class="c num">' + f1(fin) + '</td><td colspan="2"></td></tr>';
 }
 function detailRow(r, editable) {
