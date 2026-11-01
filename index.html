@@ -95,9 +95,26 @@ button{font:inherit;color:inherit}
 .empty{padding:28px 12px;text-align:center;color:var(--muted);font-size:13px}
 
 /* KPI tiles */
-.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
-@media (max-width:1250px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi.hero{grid-column:span 2;grid-row:span 2;cursor:default;padding:16px 18px;gap:0}
+.kpi.hero:hover{border-color:var(--border);box-shadow:none}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi.hero{grid-column:1/-1;grid-row:auto}}
+.hero-in{display:flex;gap:16px 26px;flex-wrap:wrap;align-items:stretch;height:100%}
+.hero-main{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:180px}
+.hero-main .d{max-width:220px}
+.hero-depts{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:7px;border-inline-start:1px solid var(--grid);padding-inline-start:22px}
+.hero-depts .ttl{font-size:12.5px;color:var(--ink-2);font-weight:600;margin-bottom:2px}
+.drow{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) minmax(70px,1.3fr) 48px;gap:10px;align-items:center;padding:3px 6px;border-radius:8px}
+.drow:hover{background:var(--surface-2)}
+.drow:focus-visible{outline:2px solid var(--b500)}
+.drow b{font-size:12.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .meter{margin-top:0}
+.drow .num{font-size:12.5px;font-weight:700;color:var(--b900);text-align:end}
+.hero .more{all:unset;cursor:pointer;font-size:12px;color:var(--b600);font-weight:600;margin-top:auto;align-self:flex-start;padding-top:6px}
+.hero .more:hover{text-decoration:underline}
+@media (max-width:640px){.hero-depts{border-inline-start:0;padding-inline-start:0;border-top:1px solid var(--grid);padding-top:12px}.hero-main{flex:1 1 100%}}
+.ring{display:block;direction:ltr}
+.ring text{font-family:var(--font);font-variant-numeric:tabular-nums}
 .kpi{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:3px;min-width:0;transition:border-color .15s,box-shadow .15s}
 .kpi:hover{border-color:var(--b300);box-shadow:0 3px 12px rgba(2,49,62,.07)}
 .kpi:focus-visible{outline:2px solid var(--b500);outline-offset:2px}
@@ -270,9 +287,12 @@ body.wide .wrap{max-width:none}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #toast.err{background:#b42318}
 #toast.ok{background:#127a3d}
-.goal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 28px}
-.goal-grid .goal{border-top:0;padding:0}
-@media (max-width:980px){.goal-grid{grid-template-columns:minmax(0,1fr)}.goal-grid .goal{border-top:1px solid var(--grid);padding-top:10px}.goal-grid .goal:first-child{border-top:0;padding-top:0}}
+.goal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px 14px}
+.gcirc{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:8px 6px;border-radius:12px;min-width:0}
+.gcirc:hover{background:var(--surface-2)}
+.gcirc:focus-visible{outline:2px solid var(--b500)}
+.gcirc b{font-size:12.5px;font-weight:700;color:var(--b900);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.gcirc .m{font-size:11.5px;color:var(--muted)}
 .dv{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap}
 .seg-c .cnt{font-weight:500;color:var(--muted);margin-inline-start:4px}
 .key{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
@@ -854,10 +874,18 @@ function smChart(vals, ref, months, lastIdx, curIdx) {
   });
   return s + '</svg>';
 }
-function sparkline(vals) {
+function ring(v, size, sw, sub) {
+  var r = (size - sw) / 2, c = 2 * Math.PI * r, pc = v == null ? 0 : Math.max(0, Math.min(100, v)), col = v != null && v < 80 ? 'var(--p400)' : 'var(--b600)';
+  return '<svg class="ring" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true"><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="#e8eef0" stroke-width="' + sw + '"/>' +
+    (pc > 0 ? '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-dasharray="' + (c * pc / 100).toFixed(2) + ' ' + c.toFixed(2) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/>' : '') +
+    '<text x="50%" y="' + (sub ? '47%' : '50%') + '" text-anchor="middle" dominant-baseline="central" font-size="' + Math.round(size * 0.22) + '" font-weight="700" fill="var(--b900)">' + (v == null ? '—' : f1(v) + '%') + '</text>' +
+    (sub ? '<text x="50%" y="66%" text-anchor="middle" dominant-baseline="central" font-size="' + Math.round(size * 0.085) + '" fill="var(--muted)" direction="rtl">' + esc(sub) + '</text>' : '') + '</svg>';
+}
+function sparkline(vals, W, H) {
   var pts = []; vals.forEach(function (v, i) { if (v != null) pts.push([i, v]); });
   if (pts.length < 2) return '';
-  var W = 130, H = 34, k = vals.length, mn = Math.min(85, Math.min.apply(null, pts.map(function (p) { return p[1]; })) - 2);
+  W = W || 130; H = H || 34;
+  var k = vals.length, mn = Math.min(85, Math.min.apply(null, pts.map(function (p) { return p[1]; })) - 2);
   function X(i) { return W - 6 - i * ((W - 12) / Math.max(1, k - 1)); }
   function Y(v) { return H - 5 - (v - mn) / (100 - mn) * (H - 10); }
   var s = '<svg width="' + W + '" height="' + H + '" style="direction:ltr" aria-hidden="true"><line x1="6" x2="' + (W - 6) + '" y1="' + Y(100) + '" y2="' + Y(100) + '" stroke="var(--grid)" stroke-dasharray="3 3"/>';
@@ -889,7 +917,11 @@ function viewOverview() {
   var lateDepts = uniq(late.map(function (r) { return r.dept; }));
 
   var k = '<div class="kpis">';
-  k += '<button class="kpi" data-act="tab" data-tab="details" data-tip="متوسط «النسبة النهائية» لكل قسم، ثم متوسط الأقسام، بنفس معادلة صف «الإجمالي» في الورقة"><span class="l">متوسط الإنجاز الشهري للخطة</span><span class="v num">' + f1(A.overallF) + '<small>%</small></span><span class="d">' + esc(trail) + '</span>' + sparkline(A.overallM.slice(0, P.lastIdx + 1)) + '</button>';
+  k += '<div class="kpi hero"><div class="hero-in"><div class="hero-main"><span class="l">نسبة إنجاز الخطة ككل</span><span data-tip="متوسط «النسبة النهائية» لكل قسم، ثم متوسط الأقسام، بنفس معادلة صف «الإجمالي» في الورقة">' + ring(A.overallF, 150, 14, 'متوسط الأقسام') + '</span><span class="d">' + esc(trail) + '</span>' + sparkline(A.overallM.slice(0, P.lastIdx + 1), 190, 40) + '</div>' +
+    '<div class="hero-depts"><div class="ttl">نسب إنجاز الأقسام</div>' + A.depts.map(function (d, i) {
+      var v = A.df[i];
+      return '<button class="drow" type="button" data-act="filter" data-dept="' + esc(d) + '" data-tip="' + esc(d + ': ' + (v == null ? 'لا بيانات' : f1(v) + '%') + ' · النقر يصفّي اللوحة') + '"><b>' + esc(d) + '</b><span class="meter"><span style="width:' + (v || 0) + '%;background:' + (v != null && v < 80 ? 'var(--p400)' : 'var(--b600)') + '"></span></span><span class="num">' + (v == null ? '—' : f1(v) + '%') + '</span></button>';
+    }).join('') + '<button class="more" type="button" data-act="tab" data-tab="details">عرض المبادرات التفصيلية ←</button></div></div></div>';
   if (cs) {
     var sheetT = C.totals[C.latest];
     k += '<button class="kpi" data-act="tab" data-tab="central"><span class="l">إنجاز النقاط المركزية (مرجّح)</span><span class="v num">' + f1(cs.wavg) + '<small>%</small></span><span class="d">شهر ' + C.latest + ' · ' + (sheetT != null ? 'رقم الورقة ' + f1(sheetT) + '%' : 'المتوسط البسيط ' + f1(cs.savg) + '%') + '</span><span class="meter"><span style="width:' + (cs.wavg || 0) + '%;background:var(--b500)"></span></span></button>';
@@ -897,7 +929,6 @@ function viewOverview() {
   k += '<button class="kpi" data-act="filter" data-st="done" data-tab="details"><span class="l">المبادرات المكتملة</span><span class="v num">' + done + '<small> / ' + n + '</small></span><span class="d">' + Math.round(done / n * 100) + '% مكتمل · <span style="color:var(--p600);font-weight:600">الوقت المنقضي ' + Math.round(elapsed) + '%</span></span><span class="meter"><span style="width:' + (done / n * 100) + '%;background:var(--st-done)"></span><span class="tick" style="right:' + elapsed + '%" title="الوقت المنقضي"></span></span></button>';
   k += '<button class="kpi" data-act="filter" data-st="doing" data-tab="details"><span class="l">قيد التنفيذ / لم تبدأ</span><span class="v num">' + doing + '<small> / ' + todo + '</small></span><span class="d">جاري العمل ' + doing + ' · لم يبدأ ' + todo + '</span><span class="meter">' + ST_ORDER.filter(function (s) { return cnt[s]; }).map(function (s) { return '<span style="width:' + (cnt[s] / n * 100) + '%;background:' + ST[s].color + '"></span>'; }).join('') + '</span></button>';
   k += '<button class="kpi" data-act="flag" data-flag="late"><span class="l"><span class="ic" style="background:var(--p600)">!</span>متأخرة عن موعدها</span><span class="v num' + (late.length ? ' alert' : '') + '">' + late.length + '</span><span class="d">' + (late.length ? 'انتهى تاريخها ولم تُنجز' + (lateDepts.length === 1 ? ' · كلها في ' + esc(lateDepts[0]) : '') : 'لا توجد مبادرات متأخرة') + '</span></button>';
-  k += '<button class="kpi" data-act="flag" data-flag="noev"><span class="l">بلا شواهد إنجاز</span><span class="v num">' + noev.length + '</span><span class="d">' + Math.round(noev.length / n * 100) + '% من المبادرات · خانة الشواهد فارغة</span><span class="meter"><span style="width:' + (noev.length / n * 100) + '%;background:var(--p300)"></span></span></button>';
   k += '</div>';
 
   /* monthly small multiples */
@@ -965,16 +996,15 @@ function viewOverview() {
   al += '</div>';
 
   /* goals */
-  var go = '<div class="card"><div class="hd"><div><h2>الأهداف الاستراتيجية والتنفيذية</h2><p class="sub">عدد المبادرات وحالتها تحت كل هدف · النقر على الهدف يصفّي اللوحة</p></div></div><div class="goal-grid">';
+  var go = '<div class="card"><div class="hd"><div><h2>الأهداف الاستراتيجية</h2><p class="sub">متوسط «النسبة النهائية» لمبادرات كل هدف · النقر على الهدف يصفّي اللوحة</p></div></div><div class="goal-grid">';
   uniq(rows.map(function (r) { return r.goal; })).forEach(function (g) {
-    var rs = rows.filter(function (r) { return r.goal === g; }), c = countBy(rs, 'st'), ex = countBy(rs, 'exec');
-    go += '<div class="goal"><div class="gh"><button type="button" data-act="filter" data-goal="' + esc(g) + '">' + esc(g) + '</button><span class="num">' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '</span></div><div class="meter">' +
-      ST_ORDER.filter(function (s) { return c[s]; }).map(function (s) { return '<span style="width:' + (c[s] / rs.length * 100) + '%;background:' + ST[s].color + '" data-tip="' + esc(ST[s].label + ': ' + c[s]) + '"></span>'; }).join('') +
-      '</div><div class="gchips">' + uniq(rs.map(function (r) { return r.exec; })).map(function (e) { return '<button type="button" data-act="filter" data-exec="' + esc(e) + '">' + esc(e) + ' · ' + ex[e] + '</button>'; }).join('') + '</div></div>';
+    var rs = rows.filter(function (r) { return r.goal === g; }), c = countBy(rs, 'st'), ex = countBy(rs, 'exec'), v = avg(rs.map(function (r) { return r.fin; }));
+    var tip = g + '\n' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '\n' + uniq(rs.map(function (r) { return r.exec; })).map(function (e) { return '• ' + e + ': ' + ex[e]; }).join('\n');
+    go += '<button class="gcirc" type="button" data-act="filter" data-goal="' + esc(g) + '" data-tip="' + esc(tip) + '">' + ring(v, 104, 10) + '<b>' + esc(g) + '</b><span class="m num">' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '</span></button>';
   });
   go += '</div></div>';
 
-  return '<div class="view">' + k + '<div class="grid two">' + sm + sb + '</div><div class="grid two">' + hm + al + '</div>' + go + '</div>';
+  return '<div class="view">' + k + '<div class="grid two">' + sm + sb + '</div><div class="grid two">' + go + al + '</div>' + hm + '</div>';
 }
 
 function cKind(it, m) {
