@@ -293,6 +293,9 @@ body.wide .wrap{max-width:none}
 .gcirc:focus-visible{outline:2px solid var(--b500)}
 .gcirc b{font-size:12.5px;font-weight:700;color:var(--b900);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .gcirc .m{font-size:11.5px;color:var(--muted)}
+.goalc{display:flex;flex-direction:column;align-items:stretch;min-width:0}
+.goalc .gchips{justify-content:center;margin-top:4px}
+.goalc .gchips button{text-align:center;line-height:1.5}
 .dv{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap}
 .seg-c .cnt{font-weight:500;color:var(--muted);margin-inline-start:4px}
 .key{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
@@ -1000,7 +1003,8 @@ function viewOverview() {
   uniq(rows.map(function (r) { return r.goal; })).forEach(function (g) {
     var rs = rows.filter(function (r) { return r.goal === g; }), c = countBy(rs, 'st'), ex = countBy(rs, 'exec'), v = avg(rs.map(function (r) { return r.fin; }));
     var tip = g + '\n' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '\n' + uniq(rs.map(function (r) { return r.exec; })).map(function (e) { return '• ' + e + ': ' + ex[e]; }).join('\n');
-    go += '<button class="gcirc" type="button" data-act="filter" data-goal="' + esc(g) + '" data-tip="' + esc(tip) + '">' + ring(v, 104, 10) + '<b>' + esc(g) + '</b><span class="m num">' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '</span></button>';
+    go += '<div class="goalc"><button class="gcirc" type="button" data-act="filter" data-goal="' + esc(g) + '" data-tip="' + esc(tip) + '">' + ring(v, 104, 10) + '<b>' + esc(g) + '</b><span class="m num">' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '</span></button>' +
+      '<div class="gchips">' + uniq(rs.map(function (r) { return r.exec; })).map(function (e) { return '<button type="button" data-act="filter" data-exec="' + esc(e) + '">' + esc(e) + ' · ' + ex[e] + '</button>'; }).join('') + '</div></div>';
   });
   go += '</div></div>';
 
