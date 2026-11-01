@@ -99,20 +99,25 @@ button{font:inherit;color:inherit}
 .kpi.hero{grid-column:span 2;grid-row:span 2;cursor:default;padding:16px 18px;gap:0}
 .kpi.hero:hover{border-color:var(--border);box-shadow:none}
 @media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi.hero{grid-column:1/-1;grid-row:auto}}
-.hero-in{display:flex;gap:16px 26px;flex-wrap:wrap;align-items:stretch;height:100%}
-.hero-main{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:180px}
-.hero-main .d{max-width:220px}
-.hero-depts{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:7px;border-inline-start:1px solid var(--grid);padding-inline-start:22px}
-.hero-depts .ttl{font-size:12.5px;color:var(--ink-2);font-weight:600;margin-bottom:2px}
-.drow{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) minmax(70px,1.3fr) 48px;gap:10px;align-items:center;padding:3px 6px;border-radius:8px}
+.hero-in{display:flex;flex-direction:column;gap:10px;height:100%}
+.hero-top{display:flex;gap:12px 22px;flex-wrap:wrap;align-items:center}
+.hero-main{flex:0 0 auto;display:flex;align-items:center;gap:14px;min-width:0}
+.hero-main .tx{display:flex;flex-direction:column;gap:4px;max-width:200px}
+.hero-depts{flex:1 1 220px;min-width:0;max-width:340px;margin-inline-start:auto;display:flex;flex-direction:column;gap:2px}
+.hero-depts .ttl{font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:2px}
+.drow{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) 90px 40px;gap:8px;align-items:center;padding:2px 6px;border-radius:7px}
 .drow:hover{background:var(--surface-2)}
+.drow.on{background:var(--b50);box-shadow:inset 0 0 0 1px var(--b200)}
 .drow:focus-visible{outline:2px solid var(--b500)}
-.drow b{font-size:12.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.drow .meter{margin-top:0}
-.drow .num{font-size:12.5px;font-weight:700;color:var(--b900);text-align:end}
-.hero .more{all:unset;cursor:pointer;font-size:12px;color:var(--b600);font-weight:600;margin-top:auto;align-self:flex-start;padding-top:6px}
+.drow b{font-size:11.5px;font-weight:600;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .meter{margin-top:0;height:6px}
+.drow .num{font-size:11.5px;font-weight:700;color:var(--b900);text-align:end}
+.hero-chart{border-top:1px solid var(--grid);padding-top:10px;flex:1;display:flex;flex-direction:column;min-height:0}
+.hero-chart .hh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);font-weight:600}
+.hero-chart svg{display:block;width:100%;height:auto;margin-top:4px}
+.hero .more{all:unset;cursor:pointer;font-size:12px;color:var(--b600);font-weight:600}
 .hero .more:hover{text-decoration:underline}
-@media (max-width:640px){.hero-depts{border-inline-start:0;padding-inline-start:0;border-top:1px solid var(--grid);padding-top:12px}.hero-main{flex:1 1 100%}}
+@media (max-width:640px){.hero-depts{max-width:none;margin-inline-start:0;flex-basis:100%;border-top:1px solid var(--grid);padding-top:8px}}
 .ring{display:block;direction:ltr}
 .ring text{font-family:var(--font);font-variant-numeric:tabular-nums}
 .kpi{all:unset;box-sizing:border-box;cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:3px;min-width:0;transition:border-color .15s,box-shadow .15s}
@@ -287,15 +292,29 @@ body.wide .wrap{max-width:none}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #toast.err{background:#b42318}
 #toast.ok{background:#127a3d}
-.goal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px 14px}
-.gcirc{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:8px 6px;border-radius:12px;min-width:0}
+.goal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px 14px}
+.goalc{display:flex;flex-direction:column;align-items:center;min-width:0}
+.gcirc{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;padding:8px 6px 4px;border-radius:12px;min-width:0;max-width:100%}
 .gcirc:hover{background:var(--surface-2)}
+.gcirc.on{background:var(--b50);box-shadow:inset 0 0 0 1px var(--b200)}
 .gcirc:focus-visible{outline:2px solid var(--b500)}
-.gcirc b{font-size:12.5px;font-weight:700;color:var(--b900);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.gcirc b{font-size:12.5px;font-weight:700;color:var(--b900);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gcirc .m{font-size:11.5px;color:var(--muted)}
-.goalc{display:flex;flex-direction:column;align-items:stretch;min-width:0}
-.goalc .gchips{justify-content:center;margin-top:4px}
-.goalc .gchips button{text-align:center;line-height:1.5}
+.gkids{position:relative;display:flex;justify-content:center;flex-wrap:wrap;gap:6px;padding-top:16px;margin-top:2px}
+.gkids::before{content:'';position:absolute;top:0;left:50%;width:1px;height:8px;background:var(--axis)}
+.gkids::after{content:'';position:absolute;top:8px;left:var(--l,50%);right:var(--l,50%);height:1px;background:var(--axis)}
+.gkid{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:50%;padding:2px}
+.gkid::before{content:'';position:absolute;top:-8px;left:50%;width:1px;height:8px;background:var(--axis)}
+.gkid:hover svg circle:first-child{stroke:var(--b100)}
+.gkid.on{box-shadow:0 0 0 2px var(--b500)}
+.gkid:focus-visible{outline:2px solid var(--b500)}
+.gkids.lab{gap:10px 14px}
+.gkids.lab .gkid{border-radius:10px;padding:4px;width:110px}
+.gkids.lab .gkid span{font-size:11px;line-height:1.4;color:var(--ink-2);text-align:center;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.unset{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--b50);color:var(--b800);border:1px solid var(--b200);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;max-width:100%}
+.unset:hover{background:var(--b100)}
+.unset b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;font-weight:600}
+.unset i{font-style:normal;font-size:13px;line-height:1}
 .dv{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap}
 .seg-c .cnt{font-weight:500;color:var(--muted);margin-inline-start:4px}
 .key{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
@@ -843,8 +862,9 @@ function linePath(vals, X, Y, color, w, dash) {
   flush();
   return out;
 }
-function smChart(vals, ref, months, lastIdx, curIdx) {
-  var W = 300, H = 200, pl = 18, pr = 46, pt = 22, pb = 30, iw = W - pl - pr, ih = H - pt - pb, k = months.length;
+function smChart(vals, ref, months, lastIdx, curIdx, W, H) {
+  W = W || 300; H = H || 200;
+  var pl = 18, pr = 46, pt = 22, pb = 30, iw = W - pl - pr, ih = H - pt - pb, k = months.length;
   var all = vals.concat(ref).filter(function (v) { return v != null; });
   var mn = all.length ? Math.min.apply(null, all) : 100;
   var lo = Math.max(0, Math.min(70, Math.floor((mn - 2) / 10) * 10)), hi = 100, step = (hi - lo) > 40 ? 20 : 10;
@@ -884,6 +904,21 @@ function ring(v, size, sw, sub) {
     '<text x="50%" y="' + (sub ? '47%' : '50%') + '" text-anchor="middle" dominant-baseline="central" font-size="' + Math.round(size * 0.22) + '" font-weight="700" fill="var(--b900)">' + (v == null ? '—' : f1(v) + '%') + '</text>' +
     (sub ? '<text x="50%" y="66%" text-anchor="middle" dominant-baseline="central" font-size="' + Math.round(size * 0.085) + '" fill="var(--muted)" direction="rtl">' + esc(sub) + '</text>' : '') + '</svg>';
 }
+function donut(segs, size, sw, center, sub) {
+  var r = (size - sw) / 2, c = 2 * Math.PI * r, tot = segs.reduce(function (a, x) { return a + x.v; }, 0), off = 0, gap = segs.filter(function (x) { return x.v; }).length > 1 ? Math.min(2, c * 0.01) : 0;
+  var s = '<svg class="ring" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true"><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="#e8eef0" stroke-width="' + sw + '"/>';
+  if (tot) segs.forEach(function (x) {
+    if (!x.v) return;
+    var len = c * x.v / tot;
+    s += '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + x.color + '" stroke-width="' + sw + '" stroke-dasharray="' + Math.max(0.5, len - gap).toFixed(2) + ' ' + c.toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/>';
+    off += len;
+  });
+  s += '<text x="50%" y="' + (sub ? '45%' : '50%') + '" text-anchor="middle" dominant-baseline="central" font-size="' + Math.round(size * (sub ? 0.2 : 0.3)) + '" font-weight="700" fill="var(--b900)">' + center + '</text>';
+  if (sub) s += '<text x="50%" y="66%" text-anchor="middle" dominant-baseline="central" font-size="' + Math.max(9, Math.round(size * 0.09)) + '" fill="var(--muted)" direction="rtl">' + esc(sub) + '</text>';
+  return s + '</svg>';
+}
+function stSegs(rs) { var c = countBy(rs, 'st'); return ST_ORDER.map(function (k) { return { v: c[k] || 0, color: ST[k].color }; }); }
+function stTip(rs) { var c = countBy(rs, 'st'); return ST_ORDER.filter(function (k) { return c[k]; }).map(function (k) { return ST[k].label + ': ' + c[k]; }).join(' · '); }
 function sparkline(vals, W, H) {
   var pts = []; vals.forEach(function (v, i) { if (v != null) pts.push([i, v]); });
   if (pts.length < 2) return '';
@@ -920,11 +955,13 @@ function viewOverview() {
   var lateDepts = uniq(late.map(function (r) { return r.dept; }));
 
   var k = '<div class="kpis">';
-  k += '<div class="kpi hero"><div class="hero-in"><div class="hero-main"><span class="l">نسبة إنجاز الخطة ككل</span><span data-tip="متوسط «النسبة النهائية» لكل قسم، ثم متوسط الأقسام، بنفس معادلة صف «الإجمالي» في الورقة">' + ring(A.overallF, 150, 14, 'متوسط الأقسام') + '</span><span class="d">' + esc(trail) + '</span>' + sparkline(A.overallM.slice(0, P.lastIdx + 1), 190, 40) + '</div>' +
+  var nullRef = P.months.map(function () { return null; });
+  k += '<div class="kpi hero"><div class="hero-in"><div class="hero-top"><div class="hero-main"><span data-tip="متوسط «النسبة النهائية» لكل قسم، ثم متوسط الأقسام، بنفس معادلة صف «الإجمالي» في الورقة">' + ring(A.overallF, 104, 10) + '</span><div class="tx"><span class="l">نسبة إنجاز الخطة ككل</span><span class="d">متوسط الأقسام · ' + esc(trail) + '</span><button class="more" type="button" data-act="tab" data-tab="details">عرض المبادرات التفصيلية ←</button></div></div>' +
     '<div class="hero-depts"><div class="ttl">نسب إنجاز الأقسام</div>' + A.depts.map(function (d, i) {
-      var v = A.df[i];
-      return '<button class="drow" type="button" data-act="filter" data-dept="' + esc(d) + '" data-tip="' + esc(d + ': ' + (v == null ? 'لا بيانات' : f1(v) + '%') + ' · النقر يصفّي اللوحة') + '"><b>' + esc(d) + '</b><span class="meter"><span style="width:' + (v || 0) + '%;background:' + (v != null && v < 80 ? 'var(--p400)' : 'var(--b600)') + '"></span></span><span class="num">' + (v == null ? '—' : f1(v) + '%') + '</span></button>';
-    }).join('') + '<button class="more" type="button" data-act="tab" data-tab="details">عرض المبادرات التفصيلية ←</button></div></div></div>';
+      var v = A.df[i], on = S.f.dept === d;
+      return '<button class="drow' + (on ? ' on' : '') + '" type="button" ' + (on ? 'data-act="unset" data-k="dept"' : 'data-act="filter" data-dept="' + esc(d) + '"') + ' data-tip="' + esc(d + ': ' + (v == null ? 'لا بيانات' : f1(v) + '%') + (on ? ' · النقر يلغي التصفية' : ' · النقر يصفّي اللوحة')) + '"><b>' + esc(d) + '</b><span class="meter"><span style="width:' + (v || 0) + '%;background:' + (v != null && v < 80 ? 'var(--p400)' : 'var(--b600)') + '"></span></span><span class="num">' + (v == null ? '—' : f1(v) + '%') + '</span></button>';
+    }).join('') + '</div></div>' +
+    '<div class="hero-chart"><div class="hh"><span>نسبة الإنجاز الشهرية للخطة</span><span class="legend"><span><i class="ln" style="background:var(--b600)"></i>متوسط الأقسام</span></span></div>' + smChart(A.overallM, nullRef, P.months, P.lastIdx, curIdx, 620, 190) + '</div></div></div>';
   if (cs) {
     var sheetT = C.totals[C.latest];
     k += '<button class="kpi" data-act="tab" data-tab="central"><span class="l">إنجاز النقاط المركزية (مرجّح)</span><span class="v num">' + f1(cs.wavg) + '<small>%</small></span><span class="d">شهر ' + C.latest + ' · ' + (sheetT != null ? 'رقم الورقة ' + f1(sheetT) + '%' : 'المتوسط البسيط ' + f1(cs.savg) + '%') + '</span><span class="meter"><span style="width:' + (cs.wavg || 0) + '%;background:var(--b500)"></span></span></button>';
@@ -999,12 +1036,25 @@ function viewOverview() {
   al += '</div>';
 
   /* goals */
-  var go = '<div class="card"><div class="hd"><div><h2>الأهداف الاستراتيجية</h2><p class="sub">متوسط «النسبة النهائية» لمبادرات كل هدف · النقر على الهدف يصفّي اللوحة</p></div></div><div class="goal-grid">';
-  uniq(rows.map(function (r) { return r.goal; })).forEach(function (g) {
-    var rs = rows.filter(function (r) { return r.goal === g; }), c = countBy(rs, 'st'), ex = countBy(rs, 'exec'), v = avg(rs.map(function (r) { return r.fin; }));
-    var tip = g + '\n' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '\n' + uniq(rs.map(function (r) { return r.exec; })).map(function (e) { return '• ' + e + ': ' + ex[e]; }).join('\n');
-    go += '<div class="goalc"><button class="gcirc" type="button" data-act="filter" data-goal="' + esc(g) + '" data-tip="' + esc(tip) + '">' + ring(v, 104, 10) + '<b>' + esc(g) + '</b><span class="m num">' + rs.length + ' مبادرة · مكتمل ' + (c.done || 0) + '</span></button>' +
-      '<div class="gchips">' + uniq(rs.map(function (r) { return r.exec; })).map(function (e) { return '<button type="button" data-act="filter" data-exec="' + esc(e) + '">' + esc(e) + ' · ' + ex[e] + '</button>'; }).join('') + '</div></div>';
+  var goals = uniq(rows.map(function (r) { return r.goal; })), single = goals.length === 1, cntAll = countBy(rows, 'st');
+  var unsets = (S.f.goal ? '<button class="unset" type="button" data-act="unset" data-k="goal" title="إلغاء تصفية الهدف"><i>✕</i><b>' + esc(S.f.goal) + '</b></button>' : '') +
+    (S.f.exec ? '<button class="unset" type="button" data-act="unset" data-k="exec" title="إلغاء تصفية الهدف التنفيذي"><i>✕</i><b>' + esc(S.f.exec) + '</b></button>' : '');
+  var go = '<div class="card"><div class="hd"><div><h2>الأهداف الاستراتيجية</h2><p class="sub">حالة مبادرات كل هدف · الدوائر الصغيرة أهدافه التنفيذية · النقر يصفّي اللوحة والنقر ثانيةً يلغي التصفية</p></div>' +
+    (unsets ? '<div style="display:flex;gap:6px;flex-wrap:wrap">' + unsets + '</div>' : '') + '</div><div class="legend" style="margin-bottom:10px">' +
+    ST_ORDER.filter(function (s) { return cntAll[s]; }).map(function (s) { return '<span><i style="background:' + ST[s].color + '"></i>' + ST[s].label + '</span>'; }).join('') + '</div><div class="goal-grid"' + (single ? ' style="grid-template-columns:minmax(0,1fr)"' : '') + '>';
+  goals.forEach(function (g) {
+    var rs = rows.filter(function (r) { return r.goal === g; }), c = countBy(rs, 'st'), on = S.f.goal === g;
+    var execs = uniq(rs.map(function (r) { return r.exec; }));
+    go += '<div class="goalc"><button class="gcirc' + (on ? ' on' : '') + '" type="button" ' + (on ? 'data-act="unset" data-k="goal"' : 'data-act="filter" data-goal="' + esc(g) + '"') + ' data-tip="' + esc(g + '\n' + stTip(rs) + (on ? '\nالنقر يلغي التصفية' : '')) + '">' +
+      donut(stSegs(rs), single ? 130 : 108, single ? 16 : 13, Math.round((c.done || 0) / rs.length * 100) + '%', 'أُنجز ' + (c.done || 0) + ' من ' + rs.length) + '<b>' + esc(g) + '</b></button>';
+    if (execs.length) {
+      var kid = single ? 46 : 30;
+      go += '<div class="gkids' + (single ? ' lab' : '') + '" style="--l:calc(50% - ' + ((execs.length - 1) * (single ? 124 : kid + 10) / 2) + 'px)">' + execs.map(function (e) {
+        var es = rs.filter(function (r) { return r.exec === e; }), eon = S.f.exec === e;
+        return '<button class="gkid' + (eon ? ' on' : '') + '" type="button" ' + (eon ? 'data-act="unset" data-k="exec"' : 'data-act="filter" data-exec="' + esc(e) + '"') + ' data-tip="' + esc(e + '\n' + es.length + ' مبادرة · ' + stTip(es) + (eon ? '\nالنقر يلغي التصفية' : '')) + '">' + donut(stSegs(es), kid, single ? 7 : 5, es.length) + (single ? '<span>' + esc(e) + '</span>' : '') + '</button>';
+      }).join('') + '</div>';
+    }
+    go += '</div>';
   });
   go += '</div></div>';
 
