@@ -890,7 +890,6 @@ const ATT={
       "عدم مطالبة الطالبة بإعادة التسجيل إن كانت متأكدة من إتمامه.",
       "عند وجود شك في التسجيل السابق، يمكن للطالبة تعبئة الاستمارة، مع اعتماد الرد الأول فقط."
     ],
-    deadline:"الأحد 31 مايو 2026م، الساعة 10:00 مساءً",
     weeks:[
       [2,"https://forms.gle/ugQd9ay7gFn2xeWB6"],[3,"https://forms.gle/b4ojXV16uFwDKxaH8"],[4,"https://forms.gle/oportR8vWfoyS1mi8"],
       [5,"https://forms.gle/5kHSJhTWz9it7G7k8"],[6,"https://forms.gle/hrm6AnpvCAWvyaYU8"],[7,"https://forms.gle/1LSdXf18XD2mVaMm6"],
@@ -921,10 +920,10 @@ function attView(){
     <h1>${esc(ATT.title)}</h1>
     <p>إجراءات اتخذتها الإدارة لتنظيم الأعذار وإتاحة فرص استكمال تسجيل الحضور، وفق ضوابط معلنة للطالبات.</p>
   </section>
-  <div class="att-note">${ic("info")}<span><b>توثيق لإجراءات سابقة:</b> تُعرض هذه الإجراءات والروابط والمواعيد بوصفها مراجع تاريخية من الإعلانات الأصلية، ولا تعني أن الاستمارات ما زالت تستقبل الردود حاليًا.</span></div>
+  <div class="att-note">${ic("info")}<span><b>توثيق لإجراءات سابقة:</b> تُعرض هذه الإجراءات والروابط بوصفها مراجع تاريخية من الإعلانات الأصلية، ولا تعني أن الاستمارات ما زالت تستقبل الردود حاليًا.</span></div>
   <div class="att-cards">
     ${card("ac-exc","fileCheck","الإجراء الأول",ATT.exc.short,ATT.exc.summary,[["check","إثبات العذر داخل الاستمارة"],["shield","دراسة الطلبات وفق الضوابط"],["buoy","استثناء معتمد لطالبات بلاد الحرب"]],"att-exc","عرض إجراءات الأعذار")}
-    ${card("ac-wk","calendar","الإجراء الثاني",ATT.wk.short,ATT.wk.summary,[["calendar",`روابط ${ATT.wk.weeks.length} أسبوعًا دراسيًا`],["repeat","اعتماد الرد الأول فقط"],["clock","موعد تاريخي: 31 مايو 2026م"]],"att-weeks","عرض الأسابيع وروابطها")}
+    ${card("ac-wk","calendar","الإجراء الثاني",ATT.wk.short,ATT.wk.summary,[["calendar",`روابط ${ATT.wk.weeks.length} أسبوعًا دراسيًا`],["repeat","اعتماد الرد الأول فقط"]],"att-weeks","عرض الأسابيع وروابطها")}
   </div>
   <div class="statement"><div class="pat"></div><p>«${esc(ATT.closing)}»</p></div>`;
 }
@@ -953,8 +952,6 @@ function showAttWeeks(){
   <div class="m-body">
     <div class="gact"><h5>${ic("target")}الهدف</h5><p>${esc(W.goal)}</p></div>
     <div class="blk"><h5>${ic("clipboard")}آلية التنفيذ</h5>${attList(W.steps)}</div>
-    <div class="att-dl">${ic("calendar")}<div><small>آخر موعد ورد في الإعلان الأصلي</small><b>${esc(W.deadline)}</b></div></div>
-    <p class="att-hist">${ic("info")}<span>هذا موعد تاريخي من الإعلان الأصلي، وليس موعدًا مستقبليًا أو إعلانًا بأن الاستمارات ما زالت مفتوحة.</span></p>
     <div class="blk"><h5>${ic("link")}روابط استمارات الأسابيع</h5>
       <p style="margin:0;font-size:.85rem;color:var(--ink2)">مرتبة تصاعديًا، وتفتح الروابط الأصلية في نافذة جديدة بوصفها مراجع تاريخية.</p>
       <div class="wk-grid">${wk.map(([n,u],i)=>`<a class="wk" href="${esc(u)}" target="_blank" rel="noopener" style="animation-delay:${i*35}ms" aria-label="استمارة الأسبوع ${n}"><small>الأسبوع</small><b>${n}</b><span>${ic("link")}فتح الاستمارة</span></a>`).join("")}</div>
